@@ -24,7 +24,7 @@ export default function SignupPage() {
           <p className="text-sm uppercase tracking-[0.4em] text-slate-400">
             Welcome
           </p>
-          <h1 className="text-3xl font-semibold leading-tight">회원가입</h1>
+          <h1 className="text-3xl font-semibold leading-tight font-orange-500">회원가입</h1>
           <p className="text-sm text-slate-500">
             기본 정보를 입력하고 새로운 여정을 시작하세요.
           </p>
@@ -71,11 +71,11 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-slate-700">
           이미 계정이 있으신가요?{" "}
           <Link
             href="/"
-            className="font-semibold text-white underline-offset-4 transition hover:underline"
+            className="font-semibold text-amber-600 underline-offset-4 transition hover:text-amber-800"
           >
             로그인
           </Link>

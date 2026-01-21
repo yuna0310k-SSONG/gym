@@ -105,7 +105,7 @@ export default function Home() {
           아직 계정이 없으신가요?{" "}
           <Link
             href="/signup"
-            className="font-semibold text-white underline-offset-4 transition hover:underline"
+            className="font-semibold text-orange-500 underline-offset-4 transition hover:underline"
           >
             회원가입
           </Link>
