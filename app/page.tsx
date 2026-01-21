@@ -1,65 +1,116 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { FormEvent, useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setSaving(true);
+      setError(null);
+
+      const formData = new FormData(event.currentTarget);
+      const payload = {
+        email: formData.get("email"),
+        password: formData.get("password"),
+      };
+
+      try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(
+            (data as { message?: string }).message ||
+              "로그인에 실패했습니다.",
+          );
+        }
+
+        router.push("/dashboard");
+      } catch (fetchError) {
+        if (fetchError instanceof Error) {
+          setError(fetchError.message);
+        } else {
+          setError("로그인 요청에 실패했습니다.");
+        }
+      } finally {
+        setSaving(false);
+      }
+    },
+    [router],
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-amber-50 via-amber-100 to-amber-50 px-4 text-slate-900">
+      <div className="max-w-md space-y-8 rounded-2xl border border-slate-200 bg-white p-10 shadow-2xl shadow-amber-100">
+        <header className="space-y-2">
+          <p className="text-sm uppercase tracking-[0.4em] text-slate-500">
+            Gym Management
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+          <h1 className="text-3xl font-semibold leading-tight">로그인</h1>
+          <p className="text-sm text-slate-500">
+            계정 정보를 입력하면 대시보드에 바로 연결됩니다.
+          </p>
+        </header>
+
+        <form className="space-y-6" onSubmit={handleLogin}>
+          <label className="block space-y-2 text-sm">
+            <span className="text-slate-500">이메일</span>
+            <input
+              required
+              type="email"
+              name="email"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none"
+              placeholder="name@example.com"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </label>
+          <label className="block space-y-2 text-sm">
+            <span className="text-slate-500">비밀번호</span>
+            <input
+              required
+              type="password"
+              name="password"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none"
+              placeholder="••••••••"
+            />
+          </label>
+          {error && (
+            <p className="text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full rounded-2xl bg-gradient-to-r from-amber-500 to-orange-400 px-4 py-3 text-base font-semibold text-white shadow-lg transition hover:opacity-95"
+            disabled={saving}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
+            {saving ? "로그인 중..." : "로그인"}
+          </button>
+        </form>
+
+        <p className="text-sm text-slate-300">
+          아직 계정이 없으신가요?{" "}
+          <Link
+            href="/signup"
+            className="font-semibold text-white underline-offset-4 transition hover:underline"
+          >
+            회원가입
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
